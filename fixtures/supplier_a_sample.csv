@@ -1,0 +1,5 @@
+sku,ean,description,price,stock
+A-1001,4006381333931,Widget Small,9.99,120
+A-1002,4006381333948,Widget Medium,12.49,85
+A-1003,,Widget Large (no EAN),15.99,0
+A-1004,4006381333955,Widget XL,19.99,42
