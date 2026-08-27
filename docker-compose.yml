@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: supplierfeed
+      POSTGRES_PASSWORD: supplierfeed
+      POSTGRES_DB: supplierfeed
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+      - pgdata:/var/lib/postgresql/data
+
+  # Mock supplier SFTP server for local testing (stands in for a real
+  # supplier server per the "shadow stack" testing strategy).
+  sftp:
+    image: atmoz/sftp:alpine
+    ports:
+      - "2222:22"
+    volumes:
+      - ./fixtures/supplier_a_sample.csv:/home/feeduser/upload/supplier_a_sample.csv:ro
+    command: feeduser:feedpass:1001:100:upload
+
+volumes:
+  pgdata:
