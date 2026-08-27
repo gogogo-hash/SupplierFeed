@@ -9,10 +9,26 @@ from .config import load_postgres_config, load_sftp_config
 from .db import get_connection, insert_staging_row
 from .sftp_client import StaleFileError, UnstableFileError, fetch_file
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s run_id=%(run_id)s level=%(levelname)s %(message)s",
-)
+def _configure_logging(run_id: uuid.UUID) -> logging.LoggerAdapter:
+    # A dedicated, non-propagating logger/handler -- rather than
+    # logging.basicConfig() on the root logger -- so this run_id-tagged
+    # format only applies to our own log records. paramiko logs its own
+    # SSH/SFTP handshake messages to the root logger, and those records
+    # have no run_id field, so attaching this format to root crashes with
+    # a KeyError the first time paramiko logs anything.
+    logging.getLogger("paramiko").setLevel(logging.WARNING)
+
+    handler = logging.StreamHandler()
+    handler.setFormatter(
+        logging.Formatter("%(asctime)s run_id=%(run_id)s level=%(levelname)s %(message)s")
+    )
+
+    logger = logging.getLogger("ingest")
+    logger.setLevel(logging.INFO)
+    logger.addHandler(handler)
+    logger.propagate = False
+
+    return logging.LoggerAdapter(logger, {"run_id": run_id})
 
 
 def main() -> int:
@@ -24,7 +40,7 @@ def main() -> int:
     args = parser.parse_args()
 
     run_id = uuid.uuid4()
-    log = logging.LoggerAdapter(logging.getLogger(__name__), {"run_id": run_id})
+    log = _configure_logging(run_id)
 
     sftp_config = load_sftp_config()
     pg_config = load_postgres_config()
