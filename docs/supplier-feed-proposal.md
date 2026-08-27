@@ -4,8 +4,6 @@
 
 # 1. Proposal
 
-Hi [Client Name],
-
 This proposal is based on the "Connect suppliers FTP Servers with our Shopify" contract posted on Upwork.
 
 **Summary:** I've taken note that supplier feeds are procurement signals, not stock. Writing them into Shopify inventory conflates what a supplier claims to have with what you can actually ship, and a lagging or overstated feed becomes an oversell on your side. Keeping supplier data out of Shopify inventory and treating your own warehouse as the only source of truth for sellable stock is correct.
